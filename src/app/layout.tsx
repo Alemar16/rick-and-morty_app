@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Rick and Morty App",
-  description: "Explore the multiverse of Rick and Morty",
+  description: "A Next.js application featuring Rick and Morty content",
 };
 
 export default function RootLayout({
@@ -28,7 +28,9 @@ export default function RootLayout({
         >
           <div className="relative flex min-h-screen flex-col">
             <Navbar />
-            <main className="flex-1">{children}</main>
+            <main className="container mx-auto flex-1 px-4 py-8 sm:px-6 lg:px-8">
+              {children}
+            </main>
             <Footer />
           </div>
         </ThemeProvider>
