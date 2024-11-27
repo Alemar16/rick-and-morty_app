@@ -34,7 +34,7 @@ export function Navbar() {
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px]">
               <SheetHeader>
-                <SheetTitle>Navigation</SheetTitle>
+                <SheetTitle className="font-heading">Navigation</SheetTitle>
               </SheetHeader>
               <div className="flex flex-col space-y-4 py-4">
                 <Link
@@ -50,7 +50,7 @@ export function Navbar() {
                   About
                 </Link>
                 <div className="px-2 py-1">
-                  <h3 className="mb-2 text-lg font-medium">More</h3>
+                  <h3 className="mb-2 text-lg font-heading font-medium">More</h3>
                   <div className="flex flex-col space-y-2 pl-4">
                     <Link
                       href="/docs"
@@ -90,7 +90,7 @@ export function Navbar() {
               height={40}
               className="rounded-full"
             />
-            <span className="inline-block font-bold">Rick & Morty</span>
+            <span className="inline-block font-heading font-bold">Rick & Morty</span>
           </Link>
         </div>
 
