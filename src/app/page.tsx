@@ -1,9 +1,5 @@
-import React from 'react'
+import { CharactersContainer } from "@/components/characters/characters-container"
 
-const HomePage = () => {
-  return (
-    <div className='text-3xl'>HomePage</div>
-  )
+export default function HomePage() {
+  return <CharactersContainer />
 }
-
-export default HomePage
