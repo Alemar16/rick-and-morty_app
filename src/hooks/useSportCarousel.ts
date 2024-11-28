@@ -1,103 +1,107 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { SportCharacter } from '@/components/sport-cards/types';
-import { getRandomCharacters, getNextCharacter } from '@/services/sport-card-service';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { SportCharacter, CarouselState } from '@/components/sport-cards/types';
+import { getRandomCharacters } from '@/services/sport-card-service';
 
-const ROTATION_INTERVAL = 3000; // 3 segundos
-const PAUSE_DURATION = 2000; // 2 segundos de pausa después de control manual
+const ROTATION_INTERVAL = 3000;
+const BUFFER_SIZE = 20;
+const INITIAL_INDEX = 0;
+
+const initialState: CarouselState = {
+  allCards: [],
+  currentIndex: INITIAL_INDEX,
+  isTransitioning: false,
+};
 
 export function useSportCarousel() {
-  const [characters, setCharacters] = useState<SportCharacter[]>([]);
-  const [activeIndex, setActiveIndex] = useState(1);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [state, setState] = useState<CarouselState>(initialState);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isPaused, setIsPaused] = useState(false);
 
-  // Cargar personajes iniciales
+  // Cargar tarjetas iniciales
   useEffect(() => {
-    const loadInitialCharacters = async () => {
-      const initialCharacters = await getRandomCharacters(3);
-      setCharacters(initialCharacters);
+    const loadInitialCards = async () => {
+      const cards = await getRandomCharacters(BUFFER_SIZE);
+      setState(prev => ({
+        ...prev,
+        allCards: cards,
+        currentIndex: INITIAL_INDEX
+      }));
     };
-    loadInitialCharacters();
+    loadInitialCards();
   }, []);
 
-  // Función para rotar los personajes
-  const rotateCharacters = useCallback(async (direction: 'next' | 'prev') => {
-    if (isTransitioning || characters.length < 3) return;
+  // Obtener las tres tarjetas visibles actuales
+  const visibleCards = useMemo(() => {
+    if (state.allCards.length < 3) return [];
+    return [
+      state.allCards[state.currentIndex],
+      state.allCards[state.currentIndex + 1],
+      state.allCards[state.currentIndex + 2],
+    ];
+  }, [state.allCards, state.currentIndex]);
 
-    setIsTransitioning(true);
-    try {
-      const nextCharacter = await getNextCharacter();
-      
-      setCharacters(prev => {
-        const newCharacters = [...prev];
-        if (direction === 'next') {
-          newCharacters.shift();
-          newCharacters.push(nextCharacter);
-        } else {
-          newCharacters.pop();
-          newCharacters.unshift(nextCharacter);
-        }
-        return newCharacters;
-      });
-    } catch (error) {
-      console.error('Error rotating characters:', error);
-    } finally {
-      setIsTransitioning(false);
-    }
-  }, [characters.length, isTransitioning]);
+  // Función para rotar las tarjetas
+  const rotateCards = useCallback((direction: 'left' | 'right') => {
+    if (state.isTransitioning) return;
 
-  // Control manual
-  const handleNext = useCallback(() => {
-    setIsPlaying(false);
-    rotateCharacters('next');
-    setIsPaused(true);
+    setState(prev => {
+      const newIndex = direction === 'right' 
+        ? Math.min(prev.currentIndex + 1, prev.allCards.length - 3)
+        : Math.max(0, prev.currentIndex - 1);
+
+      return {
+        ...prev,
+        currentIndex: newIndex,
+        isTransitioning: true
+      };
+    });
+
+    // Finalizar la transición después de la animación
     setTimeout(() => {
-      setIsPaused(false);
-      setIsPlaying(true);
-    }, PAUSE_DURATION);
-  }, [rotateCharacters]);
+      setState(prev => ({ ...prev, isTransitioning: false }));
+    }, 500);
+  }, [state.isTransitioning]);
+
+  // Manejadores de control
+  const handleNext = useCallback(() => {
+    if (state.currentIndex < state.allCards.length - 3) {
+      rotateCards('right');
+    }
+  }, [state.currentIndex, state.allCards.length, rotateCards]);
 
   const handlePrev = useCallback(() => {
-    setIsPlaying(false);
-    rotateCharacters('prev');
-    setIsPaused(true);
-    setTimeout(() => {
-      setIsPaused(false);
-      setIsPlaying(true);
-    }, PAUSE_DURATION);
-  }, [rotateCharacters]);
+    if (state.currentIndex > 0) {
+      rotateCards('left');
+    }
+  }, [state.currentIndex, rotateCards]);
 
   const handleHover = useCallback((hovering: boolean) => {
     setIsPlaying(!hovering);
   }, []);
 
-  const togglePlay = useCallback(() => {
-    setIsPlaying(prev => !prev);
-    setIsPaused(false);
-  }, []);
-
   // Rotación automática
   useEffect(() => {
-    if (!isPlaying || isPaused) return;
+    if (!isPlaying || visibleCards.length < 3) return;
 
     const interval = setInterval(() => {
-      rotateCharacters('next');
+      if (state.currentIndex < state.allCards.length - 3) {
+        rotateCards('right');
+      } else {
+        setState(prev => ({ ...prev, currentIndex: 0 }));
+      }
     }, ROTATION_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [isPlaying, isPaused, rotateCharacters]);
+  }, [isPlaying, rotateCards, state.currentIndex, state.allCards.length, visibleCards.length]);
 
   return {
-    characters,
-    activeIndex,
-    isTransitioning,
-    isPlaying,
+    characters: visibleCards,
+    isTransitioning: state.isTransitioning,
     handleNext,
     handlePrev,
     handleHover,
-    togglePlay
+    currentIndex: state.currentIndex,
+    totalCards: state.allCards.length
   };
 }
