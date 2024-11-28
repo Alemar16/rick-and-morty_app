@@ -1,107 +1,143 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { SportCharacter, CarouselState } from '@/components/sport-cards/types';
+import { CarouselState } from '@/components/sport-cards/types';
 import { getRandomCharacters } from '@/services/sport-card-service';
+import { Character } from '@/types/character';
 
 const ROTATION_INTERVAL = 3000;
 const BUFFER_SIZE = 20;
+const VISIBLE_CARDS = 5;
 const INITIAL_INDEX = 0;
 
 const initialState: CarouselState = {
   allCards: [],
   currentIndex: INITIAL_INDEX,
   isTransitioning: false,
+  isLoading: true,
 };
 
 export function useSportCarousel() {
   const [state, setState] = useState<CarouselState>(initialState);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   // Cargar tarjetas iniciales
   useEffect(() => {
+    let isMounted = true;
+
     const loadInitialCards = async () => {
-      const cards = await getRandomCharacters(BUFFER_SIZE);
-      setState(prev => ({
-        ...prev,
-        allCards: cards,
-        currentIndex: INITIAL_INDEX
-      }));
+      try {
+        setState(prev => ({ ...prev, isLoading: true }));
+        console.log('Fetching initial cards...');
+        
+        const cards = await getRandomCharacters(BUFFER_SIZE);
+        console.log('Received cards:', cards);
+
+        if (!isMounted) return;
+
+        if (!cards || cards.length === 0) {
+          throw new Error('No cards loaded');
+        }
+
+        setState(prev => ({
+          ...prev,
+          allCards: cards,
+          currentIndex: INITIAL_INDEX,
+          isLoading: false
+        }));
+
+        console.log('State updated with cards');
+      } catch (error) {
+        console.error('Error loading cards:', error);
+        if (isMounted) {
+          setState(prev => ({ ...prev, isLoading: false }));
+        }
+      }
     };
+
     loadInitialCards();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Obtener las tres tarjetas visibles actuales
+  // Obtener las cinco tarjetas visibles actuales
   const visibleCards = useMemo(() => {
-    if (state.allCards.length < 3) return [];
-    return [
-      state.allCards[state.currentIndex],
-      state.allCards[state.currentIndex + 1],
-      state.allCards[state.currentIndex + 2],
-    ];
-  }, [state.allCards, state.currentIndex]);
-
-  // Función para rotar las tarjetas
-  const rotateCards = useCallback((direction: 'left' | 'right') => {
-    if (state.isTransitioning) return;
-
-    setState(prev => {
-      const newIndex = direction === 'right' 
-        ? Math.min(prev.currentIndex + 1, prev.allCards.length - 3)
-        : Math.max(0, prev.currentIndex - 1);
-
-      return {
-        ...prev,
-        currentIndex: newIndex,
-        isTransitioning: true
-      };
-    });
-
-    // Finalizar la transición después de la animación
-    setTimeout(() => {
-      setState(prev => ({ ...prev, isTransitioning: false }));
-    }, 500);
-  }, [state.isTransitioning]);
-
-  // Manejadores de control
-  const handleNext = useCallback(() => {
-    if (state.currentIndex < state.allCards.length - 3) {
-      rotateCards('right');
+    if (state.isLoading || !state.allCards || state.allCards.length < VISIBLE_CARDS) {
+      console.log('No visible cards yet - loading:', state.isLoading, 'cards length:', state.allCards?.length);
+      return [];
     }
-  }, [state.currentIndex, state.allCards.length, rotateCards]);
 
-  const handlePrev = useCallback(() => {
-    if (state.currentIndex > 0) {
-      rotateCards('left');
-    }
-  }, [state.currentIndex, rotateCards]);
+    const startIndex = Math.max(0, Math.min(state.currentIndex, state.allCards.length - VISIBLE_CARDS));
+    const endIndex = startIndex + VISIBLE_CARDS;
+    const cards = state.allCards.slice(startIndex, endIndex);
 
-  const handleHover = useCallback((hovering: boolean) => {
-    setIsPlaying(!hovering);
-  }, []);
+    console.log('Visible cards:', cards);
+    return cards;
+  }, [state.allCards, state.currentIndex, state.isLoading]);
 
   // Rotación automática
   useEffect(() => {
-    if (!isPlaying || visibleCards.length < 3) return;
+    if (!isPlaying || state.isLoading || !visibleCards.length) {
+      return;
+    }
 
     const interval = setInterval(() => {
-      if (state.currentIndex < state.allCards.length - 3) {
-        rotateCards('right');
+      if (state.currentIndex < state.allCards.length - VISIBLE_CARDS) {
+        handleNext();
       } else {
-        setState(prev => ({ ...prev, currentIndex: 0 }));
+        setIsPlaying(false);
       }
     }, ROTATION_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [isPlaying, rotateCards, state.currentIndex, state.allCards.length, visibleCards.length]);
+  }, [isPlaying, state.currentIndex, state.allCards.length, state.isLoading, visibleCards.length]);
+
+  const handleNext = useCallback(() => {
+    if (state.isTransitioning || state.currentIndex >= state.allCards.length - VISIBLE_CARDS) return;
+
+    setState(prev => ({
+      ...prev,
+      currentIndex: prev.currentIndex + 1,
+      isTransitioning: true
+    }));
+
+    setTimeout(() => {
+      setState(prev => ({ ...prev, isTransitioning: false }));
+      setActiveIndex(prev => prev + 1);
+    }, 500);
+  }, [state.isTransitioning, state.currentIndex, state.allCards.length]);
+
+  const handlePrev = useCallback(() => {
+    if (state.isTransitioning || state.currentIndex <= 0) return;
+
+    setState(prev => ({
+      ...prev,
+      currentIndex: prev.currentIndex - 1,
+      isTransitioning: true
+    }));
+
+    setTimeout(() => {
+      setState(prev => ({ ...prev, isTransitioning: false }));
+      setActiveIndex(prev => prev - 1);
+    }, 500);
+  }, [state.isTransitioning, state.currentIndex]);
+
+  const handleHover = useCallback((isHovered: boolean) => {
+    setIsPlaying(!isHovered);
+  }, []);
 
   return {
     characters: visibleCards,
     isTransitioning: state.isTransitioning,
+    isLoading: state.isLoading,
     handleNext,
     handlePrev,
     handleHover,
     currentIndex: state.currentIndex,
-    totalCards: state.allCards.length
+    totalCards: state.allCards.length,
+    activeIndex
   };
 }
