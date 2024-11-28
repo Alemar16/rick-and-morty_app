@@ -5,11 +5,14 @@ import { SportCharacter } from '@/components/sport-cards/types';
 import { getRandomCharacters, getNextCharacter } from '@/services/sport-card-service';
 
 const ROTATION_INTERVAL = 3000; // 3 segundos
+const PAUSE_DURATION = 2000; // 2 segundos de pausa después de control manual
 
 export function useSportCarousel() {
   const [characters, setCharacters] = useState<SportCharacter[]>([]);
-  const [activeIndex, setActiveIndex] = useState(1); // Comienza con el elemento central
+  const [activeIndex, setActiveIndex] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
 
   // Cargar personajes iniciales
   useEffect(() => {
@@ -21,7 +24,7 @@ export function useSportCarousel() {
   }, []);
 
   // Función para rotar los personajes
-  const rotateCharacters = useCallback(async () => {
+  const rotateCharacters = useCallback(async (direction: 'next' | 'prev') => {
     if (isTransitioning || characters.length < 3) return;
 
     setIsTransitioning(true);
@@ -30,8 +33,13 @@ export function useSportCarousel() {
       
       setCharacters(prev => {
         const newCharacters = [...prev];
-        newCharacters.shift(); // Eliminar el primer personaje
-        newCharacters.push(nextCharacter); // Añadir el nuevo personaje al final
+        if (direction === 'next') {
+          newCharacters.shift();
+          newCharacters.push(nextCharacter);
+        } else {
+          newCharacters.pop();
+          newCharacters.unshift(nextCharacter);
+        }
         return newCharacters;
       });
     } catch (error) {
@@ -41,15 +49,55 @@ export function useSportCarousel() {
     }
   }, [characters.length, isTransitioning]);
 
+  // Control manual
+  const handleNext = useCallback(() => {
+    setIsPlaying(false);
+    rotateCharacters('next');
+    setIsPaused(true);
+    setTimeout(() => {
+      setIsPaused(false);
+      setIsPlaying(true);
+    }, PAUSE_DURATION);
+  }, [rotateCharacters]);
+
+  const handlePrev = useCallback(() => {
+    setIsPlaying(false);
+    rotateCharacters('prev');
+    setIsPaused(true);
+    setTimeout(() => {
+      setIsPaused(false);
+      setIsPlaying(true);
+    }, PAUSE_DURATION);
+  }, [rotateCharacters]);
+
+  const handleHover = useCallback((hovering: boolean) => {
+    setIsPlaying(!hovering);
+  }, []);
+
+  const togglePlay = useCallback(() => {
+    setIsPlaying(prev => !prev);
+    setIsPaused(false);
+  }, []);
+
   // Rotación automática
   useEffect(() => {
-    const interval = setInterval(rotateCharacters, ROTATION_INTERVAL);
+    if (!isPlaying || isPaused) return;
+
+    const interval = setInterval(() => {
+      rotateCharacters('next');
+    }, ROTATION_INTERVAL);
+
     return () => clearInterval(interval);
-  }, [rotateCharacters]);
+  }, [isPlaying, isPaused, rotateCharacters]);
 
   return {
     characters,
     activeIndex,
     isTransitioning,
+    isPlaying,
+    handleNext,
+    handlePrev,
+    handleHover,
+    togglePlay
   };
 }
