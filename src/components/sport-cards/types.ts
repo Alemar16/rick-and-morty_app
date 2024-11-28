@@ -8,15 +8,24 @@ export interface SportCharacter {
   image: string;
 }
 
-export interface CarouselState {
-  allCards: Character[];      // Buffer completo de tarjetas
-  currentIndex: number;           // Índice actual en el buffer
+export type CarouselState = {
+  allCards: Character[];
+  currentIndex: number;
   isTransitioning: boolean;
-}
+  isLoading: boolean;
+};
 
-export interface SportCardProps {
+export type SportCardProps = {
   character: Character;
   isCenter: boolean;
-  position: 'left' | 'center' | 'right';
+  position: number;
   onCardClick?: () => void;
+};
+
+export interface CarouselControlsProps {
+  onNext: () => void;
+  onPrev: () => void;
+  canGoNext: boolean;
+  canGoPrev: boolean;
+  isTransitioning: boolean;
 }
