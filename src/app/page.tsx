@@ -1,170 +1,109 @@
 import { SportCardCarousel } from "@/components/sport-cards/SportCardCarousel";
+import { SocialShareGrid } from "@/components/social/SocialShareGrid";
 import Link from "next/link";
-import { 
-  FaSearch, 
-  FaIdCard, 
-  FaFilter, 
-  FaRocket, 
-  FaCode, 
-  FaServer, 
-  FaDatabase, 
-  FaImages, 
-  FaArrowRight, 
-  FaFacebookF, 
-  FaInstagram, 
-  FaTwitter, 
-  FaLinkedinIn, 
-  FaWhatsapp, 
-  FaTelegram 
+import {
+  FaSearch,
+  FaIdCard,
+  FaFilter,
+  FaRocket,
+  FaCode,
+  FaServer,
+  FaDatabase,
+  FaImages,
+  FaArrowRight,
 } from "react-icons/fa";
 
 export default function HomePage() {
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const shareTitle = "Check out this awesome Rick and Morty Character Explorer!";
-  const shareMessage = "Explore the multiverse with this amazing Rick and Morty Character viewer. Check it out!";
-
-  const socialLinks = [
-    {
-      icon: <FaFacebookF className="w-5 h-5" />,
-      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-      color: "hover:text-blue-600",
-      label: "Share on Facebook"
-    },
-    {
-      icon: <FaInstagram className="w-5 h-5" />,
-      url: `https://www.instagram.com/share?url=${encodeURIComponent(shareUrl)}`,
-      color: "hover:text-pink-600",
-      label: "Share on Instagram"
-    },
-    {
-      icon: <FaTwitter className="w-5 h-5" />,
-      url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`,
-      color: "hover:text-gray-800",
-      label: "Share on X (Twitter)"
-    },
-    {
-      icon: <FaLinkedinIn className="w-5 h-5" />,
-      url: `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareTitle)}`,
-      color: "hover:text-blue-700",
-      label: "Share on LinkedIn"
-    },
-    {
-      icon: <FaWhatsapp className="w-5 h-5" />,
-      url: `https://wa.me/?text=${encodeURIComponent(shareMessage + " " + shareUrl)}`,
-      color: "hover:text-green-500",
-      label: "Share on WhatsApp"
-    },
-    {
-      icon: <FaTelegram className="w-5 h-5" />,
-      url: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareMessage)}`,
-      color: "hover:text-blue-500",
-      label: "Share on Telegram"
-    }
-  ];
-
   return (
-    <main className="min-h-screen flex flex-col items-center p-2 gap-10 mt-5">
-      {/* Header Section with Social Icons */}
-      <header className="flex flex-col pl-8 mb-6">
-        <div className="flex items-start justify-between w-full gap-8">
-          <h1 
-            className="flex items-baseline text-[#5AE65A] drop-shadow-[0_0_10px_rgba(90,230,90,0.8)] transition-all duration-300 ease-in-out cursor-pointer" 
-            style={{ fontFamily: "'Get Schwifty', sans-serif" }}
-          >
-            <span className="text-8xl hover:text-[#7FFF7F]">R</span>
-            <span className="text-7xl hover:text-[#7FFF7F]">ick</span>
-            <span className="text-4xl mx-2 hover:text-[#7FFF7F]">and</span>
-            <span className="text-8xl hover:text-[#7FFF7F]">M</span>
-            <span className="text-7xl hover:text-[#7FFF7F]">orty</span>
-          </h1>
-
-          {/* Social Media Icons Grid */}
-          <div className="grid grid-cols-3 gap-4 p-4 bg-black/20 rounded-xl backdrop-blur-sm">
-            {socialLinks.map((social, index) => (
-              <a
-                key={index}
-                href={social.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`p-3 rounded-lg bg-black/30 transition-all duration-300 ${social.color} hover:scale-110 hover:bg-white/10 group`}
-                aria-label={social.label}
-              >
-                <div className="transform transition-transform group-hover:rotate-12">
-                  {social.icon}
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-        <div className="ml-2">
-          <p className="text-lg font-roboto font-black text-white/90">
-            Character Collection
-          </p>
-        </div>
-      </header>
-
-      {/* Description Section with Enhanced Typography and Layout */}
-      <div className="flex w-900 max-w-7xl mx-auto px-4 gap-16 mb-16">
-        <div className="w-1/2 space-y-4">
-          <div className="space-y-3">
-            <h2 className="font-get-schwifty text-2xl text-[#5AE65A] flex items-center gap-3">
-              <FaRocket className="text-xl" />
-              Project Overview
-            </h2>
-            
-            <p className="font-poppins text-lg leading-relaxed">
-              This is a didactic exploration of building modern web applications using{' '}
-              <Link href="https://nextjs.org/blog/next-15" className="text-[#5AE65A] hover:text-[#7FFF7F] font-semibold underline decoration-dotted">
-                Next.js 15
-              </Link>{' '}
-              and the{' '}
-              <Link href="https://rickandmortyapi.com/" target="_blank" rel="noopener noreferrer" className="text-[#5AE65A] hover:text-[#7FFF7F] font-semibold underline decoration-dotted">
-                Rick and Morty API
-              </Link>.
+    <main className="min-h-screen flex flex-col items-center justify-start max-w-7xl mx-auto p-8">
+      <div className="w-full grid grid-cols-2 gap-16">
+        {/* Left Column: Title and Description */}
+        <div className="flex flex-col gap-16">
+          {/* Title Section */}
+          <div className="flex flex-col gap-2">
+            <h1 
+              className="flex items-baseline text-[#5AE65A] drop-shadow-[0_0_10px_rgba(90,230,90,0.8)] transition-all duration-300 ease-in-out cursor-pointer" 
+              style={{ fontFamily: "'Get Schwifty', sans-serif" }}
+            >
+              <span className="text-8xl hover:text-[#7FFF7F]">R</span>
+              <span className="text-7xl hover:text-[#7FFF7F]">ick</span>
+              <span className="text-4xl mx-2 hover:text-[#7FFF7F]">and</span>
+              <span className="text-8xl hover:text-[#7FFF7F]">M</span>
+              <span className="text-7xl hover:text-[#7FFF7F]">orty</span>
+            </h1>
+            <p className="text-lg font-roboto font-black text-white/90 ml-2">
+              Character Collection
             </p>
           </div>
 
-          <div className="space-y-2">
-            <h3 className="font-roboto text-lg font-bold flex items-center gap-2">
-              <FaCode className="text-[#5AE65A]" />
-              Key Features
-            </h3>
-            <ul className="space-y-1.5 font-poppins">
-              <li className="flex items-center gap-2">
-                <FaServer className="text-[#5AE65A]" />
-                <span>Server-side rendering for optimal performance</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <FaDatabase className="text-[#5AE65A]" />
-                <span>Integration with Rick and Morty API</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <FaImages className="text-[#5AE65A]" />
-                <span>Interactive character carousel display</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="pt-2">
-            <Link href="/tech" className="inline-flex items-center gap-2 text-[#5AE65A] hover:text-[#7FFF7F] font-roboto font-medium">
-              <span>Explore Tech Stack</span>
-              <FaArrowRight className="text-sm animate-pulse" />
-            </Link>
+          {/* Description Section */}
+          <div className="space-y-6">
+            <h2 className="flex items-center gap-3 font-get-schwifty text-2xl text-[#5AE65A]">
+              <FaRocket className="text-xl" />
+              Project Overview
+            </h2>
+            <div className="space-y-4">
+              <p className="text-white/80">
+                This is a didactic exploration of building modern web applications using{' '}
+                <Link href="https://nextjs.org" className="text-[#5AE65A] hover:text-[#7FFF7F] transition-colors">
+                  Next.js 15
+                </Link>{' '}
+                and the{' '}
+                <Link href="https://rickandmortyapi.com" className="text-[#5AE65A] hover:text-[#7FFF7F] transition-colors">
+                  Rick and Morty API
+                </Link>
+                .
+              </p>
+              <div className="space-y-2">
+                <h3 className="flex items-center gap-3 text-xl text-white/90">
+                  <FaCode className="text-lg" />
+                  Key Features
+                </h3>
+                <ul className="space-y-2 text-white/80">
+                  <li className="flex items-center gap-2">
+                    <FaServer className="text-[#5AE65A]" />
+                    Server-side rendering for optimal performance
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <FaDatabase className="text-[#5AE65A]" />
+                    Integration with Rick and Morty API
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <FaImages className="text-[#5AE65A]" />
+                    Interactive character carousel display
+                  </li>
+                </ul>
+              </div>
+              <Link 
+                href="/tech-stack"
+                className="inline-flex items-center gap-2 text-[#5AE65A] hover:text-[#7FFF7F] transition-colors"
+              >
+                Explore Tech Stack
+                <FaArrowRight />
+              </Link>
+            </div>
           </div>
         </div>
 
-        <div className="w-1/2">
+        {/* Right Column: Social Icons and Carousel */}
+        <div className="flex flex-col gap-16">
+          <div className="w-full flex justify-center">
+            <SocialShareGrid />
+          </div>
           <SportCardCarousel />
         </div>
       </div>
 
       {/* Search Feature Section */}
-      <section className="w-full max-w-6xl mx-auto px-4">
+      <section className="w-full mt-16">
         <div className="bg-black/40 backdrop-blur-md rounded-xl p-8 space-y-8">
           <div className="text-center space-y-4">
-            <h2 className="text-4xl font-bold text-[#5AE65A]">Find Your Favorite Characters</h2>
+            <h2 className="text-4xl font-bold text-[#5AE65A]">
+              Find Your Favorite Characters
+            </h2>
             <p className="text-xl text-white/90">
-              Explore the Rick and Morty multiverse with our interactive character finder
+              Explore the Rick and Morty multiverse with our interactive
+              character finder
             </p>
           </div>
 
@@ -173,7 +112,9 @@ export default function HomePage() {
               <div className="text-[#5AE65A] text-4xl mb-4">
                 <FaSearch className="mx-auto" />
               </div>
-              <h3 className="text-2xl font-bold text-[#5AE65A] mb-3">Search by Name</h3>
+              <h3 className="text-2xl font-bold text-[#5AE65A] mb-3">
+                Search by Name
+              </h3>
               <p className="text-white/80">
                 Find characters using their full or partial name
               </p>
@@ -183,7 +124,9 @@ export default function HomePage() {
               <div className="text-[#5AE65A] text-4xl mb-4">
                 <FaIdCard className="mx-auto" />
               </div>
-              <h3 className="text-2xl font-bold text-[#5AE65A] mb-3">Unique ID</h3>
+              <h3 className="text-2xl font-bold text-[#5AE65A] mb-3">
+                Unique ID
+              </h3>
               <p className="text-white/80">
                 Access directly using the character's identifier number
               </p>
@@ -193,7 +136,9 @@ export default function HomePage() {
               <div className="text-[#5AE65A] text-4xl mb-4">
                 <FaFilter className="mx-auto" />
               </div>
-              <h3 className="text-2xl font-bold text-[#5AE65A] mb-3">Advanced Filters</h3>
+              <h3 className="text-2xl font-bold text-[#5AE65A] mb-3">
+                Advanced Filters
+              </h3>
               <p className="text-white/80">
                 Refine your search by status, species, gender and more
               </p>
