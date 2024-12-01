@@ -36,100 +36,123 @@ export function SportCardCarousel() {
 
   const getCardStyle = (position: number) => {
     const baseTransform = 'translateX(-50%)';
-    const xOffset = position * 140;
-    const zOffset = Math.abs(position) * 100;
-    const scale = Math.max(0.8, 1 - Math.abs(position) * 0.15);
+    // Ajustamos el offset horizontal para cards más compactas
+    const xOffset = position * (Math.abs(position) > 1 ? 100 : 120);
+    const zOffset = Math.abs(position) * 120;
     
+    // Reducimos más la escala para las cards externas
+    const scale = position === 0 
+      ? 1 
+      : Math.abs(position) === 1 
+        ? 0.85 
+        : 0.7;
+    
+    // Aumentamos la opacidad para el efecto de desvanecimiento
+    const opacity = position === 0 
+      ? 1 
+      : Math.abs(position) === 1 
+        ? 0.6 
+        : 0.3;
+
     return {
       transform: `${baseTransform} translateX(${xOffset}px) translateZ(${-zOffset}px) scale(${scale})`,
       zIndex: 10 - Math.abs(position),
       transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
       position: 'absolute',
       left: '50%',
-      opacity: Math.max(0.4, 1 - Math.abs(position) * 0.3),
+      opacity,
+      filter: Math.abs(position) > 1 ? 'blur(1px)' : 'none',
+      mask: Math.abs(position) > 1 
+        ? 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)'
+        : 'none',
+      WebkitMask: Math.abs(position) > 1 
+        ? 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)'
+        : 'none',
     } as React.CSSProperties;
   };
 
   return (
-    <div className="relative h-[600px] w-full">
+    <div className="relative w-full h-[500px] -mt-4">
       {/* Efectos de luz ambiental */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Luz principal desde arriba */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/30 blur-[120px] opacity-70" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] bg-[#5AE65A]/20 blur-[100px] rounded-full" />
         
-        {/* Luces laterales para profundidad */}
-        <div className="absolute -left-20 top-1/2 -translate-y-1/2 w-[300px] h-[600px] bg-primary/20 blur-[100px] opacity-40 rotate-[-15deg]" />
-        <div className="absolute -right-20 top-1/2 -translate-y-1/2 w-[300px] h-[600px] bg-primary/20 blur-[100px] opacity-40 rotate-[15deg]" />
+        {/* Luz secundaria desde abajo */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[200px] h-[100px] bg-[#5AE65A]/10 blur-[80px] rounded-full" />
         
-        {/* Reflejo en el suelo */}
-        <div 
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] h-[250px] opacity-50"
-          style={{
-            background: 'linear-gradient(to top, var(--primary) / 0.3, transparent)',
-            filter: 'blur(70px)',
-          }}
-        />
-
-        {/* Efecto de brillo adicional en el centro */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary/20 blur-[150px] opacity-40 animate-pulse" />
+        {/* Luces laterales suaves */}
+        <div className="absolute top-1/2 -translate-y-1/2 left-0 w-[100px] h-[300px] bg-[#5AE65A]/5 blur-[60px] rounded-full" />
+        <div className="absolute top-1/2 -translate-y-1/2 right-0 w-[100px] h-[300px] bg-[#5AE65A]/5 blur-[60px] rounded-full" />
       </div>
 
       {/* Contenedor del carrusel con perspectiva */}
       <div 
-        className="relative h-full w-full overflow-hidden"
-        style={{
-          perspective: '1000px',
-          transformStyle: 'preserve-3d',
-        }}
-        onMouseEnter={() => handleHover(true)}
-        onMouseLeave={() => handleHover(false)}
+        className="absolute inset-0 perspective-[1000px]"
       >
-        <div className="absolute inset-0 flex items-center justify-center">
-          {characters.map((character, index) => {
-            const position = getCardPosition(index);
-            return (
-              <div
-                key={character.id}
-                style={getCardStyle(position)}
-                className={cn(
-                  "transform-gpu",
-                  position < 0 ? "shadow-[12px_0_20px_rgba(0,0,0,0.35)]" : "",
-                  position > 0 ? "shadow-[-12px_0_20px_rgba(0,0,0,0.35)]" : "",
-                  position === 0 ? "shadow-[0_0_25px_rgba(0,0,0,0.45)]" : ""
-                )}
-              >
-                <SportCharacterCard
-                  character={character}
-                  isCenter={position === 0}
-                  position={position}
-                  onCardClick={() => position === 0 && setSelectedCharacter(character)}
-                />
-              </div>
-            );
-          })}
-        </div>
+        {characters.map((character, index) => {
+          const position = getCardPosition(index);
+          const style = getCardStyle(position);
+          const isCenter = position === 0;
 
-        {/* Botones de navegación */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handlePrev}
-            disabled={currentIndex === 0 || isTransitioning}
-            className="bg-background/70 backdrop-blur-md hover:bg-background/80 shadow-lg border-white/20"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleNext}
-            disabled={currentIndex >= totalCards - characters.length || isTransitioning}
-            className="bg-background/70 backdrop-blur-md hover:bg-background/80 shadow-lg border-white/20"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
+          return (
+            <div
+              key={character.id}
+              style={style}
+              className={cn(
+                'transition-all duration-500',
+                isTransitioning && 'pointer-events-none'
+              )}
+              onMouseEnter={() => handleHover(true)}
+              onMouseLeave={() => handleHover(false)}
+            >
+              <SportCharacterCard
+                character={character}
+                isCenter={isCenter}
+                position={position}
+                onCardClick={() => setSelectedCharacter(character)}
+              />
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Botones de navegación */}
+      <div className="absolute bottom-28 left-1/2 transform -translate-x-1/2 flex gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handlePrev}
+          disabled={currentIndex === 0 || isTransitioning}
+          className="
+            bg-background/70 backdrop-blur-md 
+            hover:bg-background/80 
+            shadow-lg 
+            border-[#5AE65A]/30 
+            hover:border-[#5AE65A]/50
+            transition-colors
+            group
+          "
+        >
+          <ChevronLeft className="h-4 w-4 text-[#5AE65A] group-hover:text-[#7FFF7F]" />
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleNext}
+          disabled={currentIndex >= totalCards - characters.length || isTransitioning}
+          className="
+            bg-background/70 backdrop-blur-md 
+            hover:bg-background/80 
+            shadow-lg 
+            border-[#5AE65A]/30 
+            hover:border-[#5AE65A]/50
+            transition-colors
+            group
+          "
+        >
+          <ChevronRight className="h-4 w-4 text-[#5AE65A] group-hover:text-[#7FFF7F]" />
+        </Button>
       </div>
 
       {/* Modal de personaje */}
