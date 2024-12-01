@@ -4,36 +4,36 @@ import { FaSearch, FaIdCard, FaFilter, FaRocket, FaCode, FaServer, FaDatabase, F
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-between p-2 gap-16">
-      {/* Header Section - Existing Code */}
-      <header className="relative">
+    <main className="min-h-screen flex flex-col items-center p-2 gap-10 mt-5">
+      {/* Header Section */}
+      <header className="flex flex-col pl-8 mb-6 ">
         <h1 
-          className="flex items-baseline mb-8 text-[#5AE65A] drop-shadow-[0_0_10px_rgba(90,230,90,0.8)] transition-all duration-300 ease-in-out hover:scale-105 cursor-pointer z-10 hover:z-20" 
+          className="flex items-baseline text-[#5AE65A] drop-shadow-[0_0_10px_rgba(90,230,90,0.8)] transition-all duration-300 ease-in-out cursor-pointer" 
           style={{ fontFamily: "'Get Schwifty', sans-serif" }}
         >
-          <span className="text-9xl hover:text-[#7FFF7F]">R</span>
-          <span className="text-8xl hover:text-[#7FFF7F]">ick</span>
-          <span className="text-6xl mx-3 hover:text-[#7FFF7F]">and</span>
-          <span className="text-9xl hover:text-[#7FFF7F]">M</span>
-          <span className="text-8xl hover:text-[#7FFF7F]">orty</span>
+          <span className="text-8xl hover:text-[#7FFF7F]">R</span>
+          <span className="text-7xl hover:text-[#7FFF7F]">ick</span>
+          <span className="text-4xl mx-2 hover:text-[#7FFF7F]">and</span>
+          <span className="text-8xl hover:text-[#7FFF7F]">M</span>
+          <span className="text-7xl hover:text-[#7FFF7F]">orty</span>
         </h1>
-        <div className="w-full flex justify-end -mt-4">
-          <p className="text-2xl font-bold text-white z-0" style={{ fontFamily: "Roboto, sans-serif", fontWeight: 900 }}>
+        <div className="ml-2">
+          <p className="text-lg font-roboto font-black text-white/90">
             Character Collection
           </p>
         </div>
       </header>
 
       {/* Description Section with Enhanced Typography and Layout */}
-      <div className="flex w-full max-w-5xl items-center justify-between gap-4">
-        <div className="w-1/2 space-y-6">
-          <div className="space-y-4">
-            <h2 className="font-get-schwifty text-3xl text-[#5AE65A] flex items-center gap-3">
-              <FaRocket className="text-2xl" />
+      <div className="flex w-900 max-w-7xl mx-auto px-4 gap-16 mb-16">
+        <div className="w-1/2 space-y-4">
+          <div className="space-y-3">
+            <h2 className="font-get-schwifty text-2xl text-[#5AE65A] flex items-center gap-3">
+              <FaRocket className="text-xl" />
               Project Overview
             </h2>
             
-            <p className="font-poppins text-xl leading-relaxed">
+            <p className="font-poppins text-lg leading-relaxed">
               This is a didactic exploration of building modern web applications using{' '}
               <Link href="https://nextjs.org/blog/next-15" className="text-[#5AE65A] hover:text-[#7FFF7F] font-semibold underline decoration-dotted">
                 Next.js 15
@@ -45,12 +45,12 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="font-roboto text-xl font-bold flex items-center gap-2">
+          <div className="space-y-2">
+            <h3 className="font-roboto text-lg font-bold flex items-center gap-2">
               <FaCode className="text-[#5AE65A]" />
               Key Features
             </h3>
-            <ul className="space-y-2 font-poppins">
+            <ul className="space-y-1.5 font-poppins">
               <li className="flex items-center gap-2">
                 <FaServer className="text-[#5AE65A]" />
                 <span>Server-side rendering for optimal performance</span>
@@ -66,7 +66,7 @@ export default function HomePage() {
             </ul>
           </div>
 
-          <div className="pt-4">
+          <div className="pt-2">
             <Link href="/tech" className="inline-flex items-center gap-2 text-[#5AE65A] hover:text-[#7FFF7F] font-roboto font-medium">
               <span>Explore Tech Stack</span>
               <FaArrowRight className="text-sm animate-pulse" />
