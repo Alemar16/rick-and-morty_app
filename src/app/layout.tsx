@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto, Poppins } from "next/font/google";
 import "./globals.css";
 import '@/styles/carousel.css';
+import './styles/fonts.css';
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { Navbar } from "@/components/navbar/navbar";
 import { Footer } from "@/components/footer/footer";
