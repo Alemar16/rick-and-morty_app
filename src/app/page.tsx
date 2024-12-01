@@ -1,6 +1,6 @@
 import { SportCardCarousel } from "@/components/sport-cards/SportCardCarousel";
 import Link from "next/link";
-import { FaSearch, FaIdCard, FaFilter } from "react-icons/fa";
+import { FaSearch, FaIdCard, FaFilter, FaRocket, FaCode, FaServer, FaDatabase, FaImages, FaArrowRight } from "react-icons/fa";
 
 export default function HomePage() {
   return (
@@ -24,15 +24,54 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Existing Content Section */}
+      {/* Description Section with Enhanced Typography and Layout */}
       <div className="flex w-full max-w-5xl items-center justify-between gap-4">
-        <div className="w-1/2">
-          <p className="text-2xl">
-            This project is a didactic example of how to use the Rick and Morty API
-            in a Next.js 15 project with server actions. The goal is to demonstrate
-            how to fetch data from the API and display it in a carousel component
-            using server-side rendering.
-          </p>
+        <div className="w-1/2 space-y-6">
+          <div className="space-y-4">
+            <h2 className="font-get-schwifty text-3xl text-[#5AE65A] flex items-center gap-3">
+              <FaRocket className="text-2xl" />
+              Project Overview
+            </h2>
+            
+            <p className="font-poppins text-xl leading-relaxed">
+              This is a didactic exploration of building modern web applications using{' '}
+              <Link href="https://nextjs.org/blog/next-15" className="text-[#5AE65A] hover:text-[#7FFF7F] font-semibold underline decoration-dotted">
+                Next.js 15
+              </Link>{' '}
+              and the{' '}
+              <Link href="https://rickandmortyapi.com/" target="_blank" rel="noopener noreferrer" className="text-[#5AE65A] hover:text-[#7FFF7F] font-semibold underline decoration-dotted">
+                Rick and Morty API
+              </Link>.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="font-roboto text-xl font-bold flex items-center gap-2">
+              <FaCode className="text-[#5AE65A]" />
+              Key Features
+            </h3>
+            <ul className="space-y-2 font-poppins">
+              <li className="flex items-center gap-2">
+                <FaServer className="text-[#5AE65A]" />
+                <span>Server-side rendering for optimal performance</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <FaDatabase className="text-[#5AE65A]" />
+                <span>Integration with Rick and Morty API</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <FaImages className="text-[#5AE65A]" />
+                <span>Interactive character carousel display</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="pt-4">
+            <Link href="/tech" className="inline-flex items-center gap-2 text-[#5AE65A] hover:text-[#7FFF7F] font-roboto font-medium">
+              <span>Explore Tech Stack</span>
+              <FaArrowRight className="text-sm animate-pulse" />
+            </Link>
+          </div>
         </div>
 
         <div className="w-1/2">
