@@ -1,22 +1,101 @@
 import { SportCardCarousel } from "@/components/sport-cards/SportCardCarousel";
 import Link from "next/link";
-import { FaSearch, FaIdCard, FaFilter, FaRocket, FaCode, FaServer, FaDatabase, FaImages, FaArrowRight } from "react-icons/fa";
+import { 
+  FaSearch, 
+  FaIdCard, 
+  FaFilter, 
+  FaRocket, 
+  FaCode, 
+  FaServer, 
+  FaDatabase, 
+  FaImages, 
+  FaArrowRight, 
+  FaFacebookF, 
+  FaInstagram, 
+  FaTwitter, 
+  FaLinkedinIn, 
+  FaWhatsapp, 
+  FaTelegram 
+} from "react-icons/fa";
 
 export default function HomePage() {
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const shareTitle = "Check out this awesome Rick and Morty Character Explorer!";
+  const shareMessage = "Explore the multiverse with this amazing Rick and Morty Character viewer. Check it out!";
+
+  const socialLinks = [
+    {
+      icon: <FaFacebookF className="w-5 h-5" />,
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      color: "hover:text-blue-600",
+      label: "Share on Facebook"
+    },
+    {
+      icon: <FaInstagram className="w-5 h-5" />,
+      url: `https://www.instagram.com/share?url=${encodeURIComponent(shareUrl)}`,
+      color: "hover:text-pink-600",
+      label: "Share on Instagram"
+    },
+    {
+      icon: <FaTwitter className="w-5 h-5" />,
+      url: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareTitle)}`,
+      color: "hover:text-gray-800",
+      label: "Share on X (Twitter)"
+    },
+    {
+      icon: <FaLinkedinIn className="w-5 h-5" />,
+      url: `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareTitle)}`,
+      color: "hover:text-blue-700",
+      label: "Share on LinkedIn"
+    },
+    {
+      icon: <FaWhatsapp className="w-5 h-5" />,
+      url: `https://wa.me/?text=${encodeURIComponent(shareMessage + " " + shareUrl)}`,
+      color: "hover:text-green-500",
+      label: "Share on WhatsApp"
+    },
+    {
+      icon: <FaTelegram className="w-5 h-5" />,
+      url: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareMessage)}`,
+      color: "hover:text-blue-500",
+      label: "Share on Telegram"
+    }
+  ];
+
   return (
     <main className="min-h-screen flex flex-col items-center p-2 gap-10 mt-5">
-      {/* Header Section */}
-      <header className="flex flex-col pl-8 mb-6 ">
-        <h1 
-          className="flex items-baseline text-[#5AE65A] drop-shadow-[0_0_10px_rgba(90,230,90,0.8)] transition-all duration-300 ease-in-out cursor-pointer" 
-          style={{ fontFamily: "'Get Schwifty', sans-serif" }}
-        >
-          <span className="text-8xl hover:text-[#7FFF7F]">R</span>
-          <span className="text-7xl hover:text-[#7FFF7F]">ick</span>
-          <span className="text-4xl mx-2 hover:text-[#7FFF7F]">and</span>
-          <span className="text-8xl hover:text-[#7FFF7F]">M</span>
-          <span className="text-7xl hover:text-[#7FFF7F]">orty</span>
-        </h1>
+      {/* Header Section with Social Icons */}
+      <header className="flex flex-col pl-8 mb-6">
+        <div className="flex items-start justify-between w-full gap-8">
+          <h1 
+            className="flex items-baseline text-[#5AE65A] drop-shadow-[0_0_10px_rgba(90,230,90,0.8)] transition-all duration-300 ease-in-out cursor-pointer" 
+            style={{ fontFamily: "'Get Schwifty', sans-serif" }}
+          >
+            <span className="text-8xl hover:text-[#7FFF7F]">R</span>
+            <span className="text-7xl hover:text-[#7FFF7F]">ick</span>
+            <span className="text-4xl mx-2 hover:text-[#7FFF7F]">and</span>
+            <span className="text-8xl hover:text-[#7FFF7F]">M</span>
+            <span className="text-7xl hover:text-[#7FFF7F]">orty</span>
+          </h1>
+
+          {/* Social Media Icons Grid */}
+          <div className="grid grid-cols-3 gap-4 p-4 bg-black/20 rounded-xl backdrop-blur-sm">
+            {socialLinks.map((social, index) => (
+              <a
+                key={index}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`p-3 rounded-lg bg-black/30 transition-all duration-300 ${social.color} hover:scale-110 hover:bg-white/10 group`}
+                aria-label={social.label}
+              >
+                <div className="transform transition-transform group-hover:rotate-12">
+                  {social.icon}
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
         <div className="ml-2">
           <p className="text-lg font-roboto font-black text-white/90">
             Character Collection
