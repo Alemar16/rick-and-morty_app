@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { CarouselState } from '@/components/sport-cards/types';
-import { getRandomCharacters } from '@/services/sport-card-service';
+import { getRandomCharacters } from '@/server/services/sport-card-service';
 import { Character } from '@/types/character';
 
 const ROTATION_INTERVAL = 3000;

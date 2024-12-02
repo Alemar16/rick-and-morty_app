@@ -1,6 +1,6 @@
 'use client';
 
-import { useSportCarousel } from "@/hooks/useSportCarousel";
+import { useCharacterCarousel } from "@/hooks/useCharacterCarousel";
 import { SportCharacterCard } from "./SportCharacterCard";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -27,7 +27,7 @@ export function SportCardCarousel() {
     handleHover,
     currentIndex,
     totalCards,
-  } = useSportCarousel();
+  } = useCharacterCarousel();
 
   const getCardPosition = (index: number): number => {
     const centerIndex = Math.floor(characters.length / 2);
