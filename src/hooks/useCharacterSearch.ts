@@ -1,18 +1,34 @@
 import { UseQueryResult, useQuery } from '@tanstack/react-query';
-import { CharacterFilters, CharacterResponse } from '@/server/models/character.model';
+import { CharacterResponse } from '@/server/models/character.model';
 import { RickMortyService } from '@/server/services/rick-morty.service';
 import { SearchFilters } from '@/types/filters';
 
 export function useCharacterSearch(
-  filters: SearchFilters
+  filters: SearchFilters,
+  enabled: boolean = false
 ): UseQueryResult<CharacterResponse, Error> {
   const searchTerm = filters.name?.trim() || '';
+  const currentPage = filters.page || 1;
   
   // Determinar si el término de búsqueda es un ID
   const isSearchById = /^\d+$/.test(searchTerm);
   
+  // Solo permitir la búsqueda si enabled es true Y hay algún filtro activo
+  const shouldSearch = enabled && (
+    searchTerm !== '' || 
+    filters.status !== '' || 
+    filters.species !== '' || 
+    filters.gender !== ''
+  );
+  
   return useQuery({
-    queryKey: ['characters', filters],
+    queryKey: ['characters', { 
+      name: filters.name,
+      status: filters.status,
+      species: filters.species,
+      gender: filters.gender,
+      page: currentPage 
+    }],
     queryFn: async () => {
       try {
         // Si es una búsqueda por ID, ajustar la URL
@@ -35,7 +51,12 @@ export function useCharacterSearch(
         }
         
         // Búsqueda normal por nombre y filtros
-        return await RickMortyService.getCharacters(filters);
+        const searchFilters = {
+          ...filters,
+          page: currentPage
+        };
+        
+        return await RickMortyService.getCharacters(searchFilters);
       } catch (error) {
         if ((error as any)?.response?.status === 404) {
           return {
@@ -46,6 +67,7 @@ export function useCharacterSearch(
         throw error;
       }
     },
+    enabled: shouldSearch, // Solo se ejecutará cuando shouldSearch sea true
     retry: false,
     staleTime: 1000 * 60 * 5, // 5 minutos
     refetchOnWindowFocus: false,
