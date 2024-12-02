@@ -5,4 +5,5 @@ export interface Season {
   year: string
   episodes: string[]
   cast: string[]
+  synopsis: string
 }

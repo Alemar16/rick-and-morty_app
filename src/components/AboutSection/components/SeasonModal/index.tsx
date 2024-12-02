@@ -57,6 +57,7 @@ export const SeasonModal = ({ season, onClose }: SeasonModalProps) => {
             <div className="flex-1">
               <h3 className="text-2xl font-bold mb-2 text-[#5AE65A]">{season.title}</h3>
               <p className="text-sm opacity-80 mb-4">{season.year}</p>
+              <p className="text-lg font-medium mb-3 text-[#5AE65A]/80">{season.synopsis}</p>
               <p className="mb-6">{season.description}</p>
 
               {/* Dropdowns */}
