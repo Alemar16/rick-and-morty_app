@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { CharacterSearch } from './CharacterSearch';
 import { CharacterSearchGrid } from './CharacterSearchGrid';
 import { useCharacterSearch } from '@/hooks/useCharacterSearch';
 import { SearchFilters } from '@/types/filters';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 const initialFilters: SearchFilters = {
   name: '',
@@ -15,27 +17,46 @@ const initialFilters: SearchFilters = {
 };
 
 export function CharacterSearchContainer() {
-  const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<SearchFilters>(initialFilters);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  const { data, isLoading, isError } = useCharacterSearch({
-    ...filters,
-    page: currentPage
-  });
+  const { data, isLoading, isError } = useCharacterSearch(filters, hasSearched);
 
-  const handleSearch = (newFilters: SearchFilters) => {
-    setCurrentPage(1);
-    setFilters(newFilters);
-  };
+  const handleSearch = useCallback((newFilters: SearchFilters) => {
+    const hasActiveFilters = 
+      (newFilters.name?.trim() || '') !== '' || 
+      (newFilters.status || '') !== '' || 
+      (newFilters.species || '') !== '' || 
+      (newFilters.gender || '') !== '';
 
-  const handleReset = () => {
-    setCurrentPage(1);
+    if (!hasActiveFilters) {
+      return;
+    }
+
+    setFilters({ 
+      name: newFilters.name || '',
+      status: newFilters.status || '',
+      species: newFilters.species || '',
+      gender: newFilters.gender || '',
+      page: 1 
+    });
+    setHasSearched(true);
+  }, []);
+
+  const handleReset = useCallback(() => {
     setFilters(initialFilters);
-  };
+    setHasSearched(false);
+  }, []);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  const handlePageChange = useCallback((page: number) => {
+    setFilters(prev => ({
+      ...prev,
+      page
+    }));
+  }, []);
+
+  const currentPage = filters.page || 1;
+  const totalPages = data?.info?.pages || 0;
 
   return (
     <div className="space-y-6">
@@ -43,14 +64,24 @@ export function CharacterSearchContainer() {
         onSearch={handleSearch}
         onReset={handleReset}
       />
-      <CharacterSearchGrid
-        characters={data?.results || []}
-        currentPage={currentPage}
-        totalPages={data?.info?.pages || 0}
-        isLoading={isLoading}
-        isError={isError}
-        onPageChange={handlePageChange}
-      />
+      {!hasSearched && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Utiliza el buscador y los filtros para encontrar personajes de Rick and Morty
+          </AlertDescription>
+        </Alert>
+      )}
+      {hasSearched && data?.results && (
+        <CharacterSearchGrid
+          characters={data.results}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          isLoading={isLoading}
+          isError={isError}
+          onPageChange={handlePageChange}
+        />
+      )}
     </div>
   );
 }
