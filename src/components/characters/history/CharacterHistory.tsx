@@ -6,12 +6,21 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
 
 export function CharacterHistory() {
-  const { recentCharacters, removeCharacter } = useCharacterHistory();
+  const { history, removeCharacter, loadHistory } = useCharacterHistory();
 
-  if (recentCharacters.length === 0) {
-    return null;
+  useEffect(() => {
+    loadHistory();
+  }, [loadHistory]);
+
+  if (history.length === 0) {
+    return (
+      <div className="p-4 text-center text-muted-foreground">
+        No hay historial de personajes
+      </div>
+    );
   }
 
   return (
@@ -23,7 +32,7 @@ export function CharacterHistory() {
         <ScrollArea className="w-full whitespace-nowrap rounded-md">
           <div className="flex space-x-4 px-4 pt-4 min-h-[80px] items-center pb-4">
             <AnimatePresence>
-              {recentCharacters.map((character) => (
+              {history.map((character) => (
                 <motion.div
                   key={character.id}
                   initial={{ opacity: 0, scale: 0.8 }}
