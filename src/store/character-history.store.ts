@@ -1,42 +1,48 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { CharacterHistory, RecentCharacter } from '@/types/history';
+import { CharacterHistory } from '@/db';
+import { characterHistoryService } from '@/services/character-history.service';
 
-interface CharacterHistoryState extends CharacterHistory {
-  addCharacter: (character: RecentCharacter) => void;
-  removeCharacter: (id: number) => void;
-  clearHistory: () => void;
+interface CharacterHistoryState {
+  history: CharacterHistory[];
+  addCharacter: (character: { id: string; name: string; image: string }) => Promise<void>;
+  removeCharacter: (characterId: string) => Promise<void>;
+  clearHistory: () => Promise<void>;
+  loadHistory: () => Promise<void>;
 }
 
-const MAX_HISTORY_ITEMS = 20;
+export const useCharacterHistory = create<CharacterHistoryState>((set) => ({
+  history: [],
+  
+  loadHistory: async () => {
+    const history = await characterHistoryService.getAll();
+    set({ history });
+  },
 
-export const useCharacterHistory = create<CharacterHistoryState>()(
-  persist(
-    (set) => ({
-      recentCharacters: [],
-      maxItems: MAX_HISTORY_ITEMS,
+  addCharacter: async (character) => {
+    const newCharacter = {
+      characterId: character.id,
+      name: character.name,
+      image: character.image,
+      timestamp: new Date(),
+    };
 
-      addCharacter: (character) =>
-        set((state) => {
-          // Evitar duplicados
-          const filtered = state.recentCharacters.filter((c) => c.id !== character.id);
-          
-          // Añadir al principio y limitar la cantidad
-          const updated = [character, ...filtered].slice(0, state.maxItems);
-          
-          return { recentCharacters: updated };
-        }),
-
-      removeCharacter: (id) =>
-        set((state) => ({
-          recentCharacters: state.recentCharacters.filter((c) => c.id !== id),
-        })),
-
-      clearHistory: () => set({ recentCharacters: [] }),
-    }),
-    {
-      name: 'character-history',
-      skipHydration: true,
+    const [added] = await characterHistoryService.add(newCharacter);
+    if (added) {
+      set((state) => ({
+        history: [...state.history, added],
+      }));
     }
-  )
-);
+  },
+
+  removeCharacter: async (characterId) => {
+    await characterHistoryService.remove(characterId);
+    set((state) => ({
+      history: state.history.filter((char) => char.characterId !== characterId),
+    }));
+  },
+
+  clearHistory: async () => {
+    await characterHistoryService.clear();
+    set({ history: [] });
+  },
+}));
