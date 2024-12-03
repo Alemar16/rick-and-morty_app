@@ -1,46 +1,45 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { CharacterSearch } from './CharacterSearch';
 import { CharacterSearchGrid } from './CharacterSearchGrid';
+import { CharacterHistory } from '../history/CharacterHistory';
 import { useCharacterSearch } from '@/hooks/useCharacterSearch';
+import { useCharacterHistory } from '@/store/character-history.store';
 import { SearchFilters } from '@/types/filters';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
 const initialFilters: SearchFilters = {
   name: '',
-  status: '',
-  species: '',
-  gender: '',
+  status: 'all',
+  species: 'all',
+  gender: 'all',
   page: 1
 };
 
 export function CharacterSearchContainer() {
   const [filters, setFilters] = useState<SearchFilters>(initialFilters);
   const [hasSearched, setHasSearched] = useState(false);
+  const { addCharacter } = useCharacterHistory();
 
   const { data, isLoading, isError } = useCharacterSearch(filters, hasSearched);
 
   const handleSearch = useCallback((newFilters: SearchFilters) => {
     const hasActiveFilters = 
       (newFilters.name?.trim() || '') !== '' || 
-      (newFilters.status || '') !== '' || 
-      (newFilters.species || '') !== '' || 
-      (newFilters.gender || '') !== '';
-
-    if (!hasActiveFilters) {
-      return;
-    }
+      newFilters.status !== '' || 
+      newFilters.species !== '' || 
+      newFilters.gender !== '';
 
     setFilters({ 
-      name: newFilters.name || '',
-      status: newFilters.status || '',
-      species: newFilters.species || '',
-      gender: newFilters.gender || '',
+      ...newFilters,
       page: 1 
     });
-    setHasSearched(true);
+    
+    if (hasActiveFilters) {
+      setHasSearched(true);
+    }
   }, []);
 
   const handleReset = useCallback(() => {
@@ -55,15 +54,32 @@ export function CharacterSearchContainer() {
     }));
   }, []);
 
+  const handleCharacterSelect = useCallback((character: any) => {
+    addCharacter({
+      id: character.id,
+      name: character.name,
+      image: character.image,
+      timestamp: Date.now()
+    });
+  }, [addCharacter]);
+
   const currentPage = filters.page || 1;
   const totalPages = data?.info?.pages || 0;
 
   return (
     <div className="space-y-6">
-      <CharacterSearch 
-        onSearch={handleSearch}
-        onReset={handleReset}
-      />
+      <div className="flex justify-between items-start gap-4">
+        <div className="flex-1 space-y-4">
+          <CharacterSearch 
+            onSearch={handleSearch}
+            onReset={handleReset}
+          />
+        </div>
+        <div className="w-[600px]">
+          <CharacterHistory />
+        </div>
+      </div>
+
       {!hasSearched && (
         <Alert>
           <AlertCircle className="h-4 w-4" />
@@ -72,6 +88,7 @@ export function CharacterSearchContainer() {
           </AlertDescription>
         </Alert>
       )}
+      
       {hasSearched && data?.results && (
         <CharacterSearchGrid
           characters={data.results}
@@ -80,6 +97,7 @@ export function CharacterSearchContainer() {
           isLoading={isLoading}
           isError={isError}
           onPageChange={handlePageChange}
+          onCharacterSelect={handleCharacterSelect}
         />
       )}
     </div>

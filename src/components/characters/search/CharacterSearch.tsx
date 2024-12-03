@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, ChangeEvent, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Search, X } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -9,139 +11,125 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { SearchFilters } from '@/types/filters';
 import { useDebounce } from '@/hooks/useDebounce';
 
-type Status = 'alive' | 'dead' | 'unknown';
-type Gender = 'female' | 'male' | 'genderless' | 'unknown';
-
-interface CharacterFilters {
-  name?: string;
-  status?: Status;
-  species?: string;
-  gender?: Gender;
-}
-
 interface CharacterSearchProps {
-  onSearch: (filters: CharacterFilters) => void;
+  onSearch: (filters: SearchFilters) => void;
   onReset: () => void;
 }
 
 export function CharacterSearch({ onSearch, onReset }: CharacterSearchProps) {
-  const [filters, setFilters] = useState<CharacterFilters>({
+  const [filters, setFilters] = useState<SearchFilters>({
     name: '',
-    status: undefined,
-    species: '',
-    gender: undefined,
+    status: 'all',
+    species: 'all',
+    gender: 'all',
   });
 
   const debouncedFilters = useDebounce(filters, 300);
 
   useEffect(() => {
-    onSearch(debouncedFilters);
+    const cleanFilters = {
+      ...debouncedFilters,
+      status: debouncedFilters.status === 'all' ? '' : debouncedFilters.status,
+      species: debouncedFilters.species === 'all' ? '' : debouncedFilters.species,
+      gender: debouncedFilters.gender === 'all' ? '' : debouncedFilters.gender,
+    };
+    onSearch(cleanFilters);
   }, [debouncedFilters, onSearch]);
 
-  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFilters(prev => ({ ...prev, name: e.target.value }));
-  };
-
-  const handleStatusChange = (value: string) => {
-    setFilters(prev => ({
-      ...prev,
-      status: value === "none" ? undefined : value as Status
-    }));
-  };
-
-  const handleSpeciesChange = (value: string) => {
-    setFilters(prev => ({
-      ...prev,
-      species: value === "none" ? "" : value
-    }));
-  };
-
-  const handleGenderChange = (value: string) => {
-    setFilters(prev => ({
-      ...prev,
-      gender: value === "none" ? undefined : value as Gender
-    }));
-  };
-
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setFilters({
       name: '',
-      status: undefined,
-      species: '',
-      gender: undefined,
+      status: 'all',
+      species: 'all',
+      gender: 'all',
     });
     onReset();
-  };
+  }, [onReset]);
 
   return (
-    <div className="space-y-4 p-4 bg-card rounded-lg shadow-sm">
-      <div className="flex flex-col gap-4 md:flex-row">
-        <div className="flex-1">
+    <div className="space-y-4 max-w-2xl">
+      <div className="flex gap-2">
+        <div className="flex-1 relative">
           <Input
-            placeholder="Buscar por nombre, apellido o ID..."
+            type="text"
+            placeholder="Buscar por nombre, apellido o por ID"
             value={filters.name}
-            onChange={handleNameChange}
-            className="w-full"
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, name: e.target.value }))
+            }
+            className="pl-9"
           />
+          <Search className="h-4 w-4 absolute left-3 top-3 text-muted-foreground" />
         </div>
+        <Button variant="outline" onClick={handleReset}>
+          <X className="h-4 w-4 mr-2" />
+          Limpiar
+        </Button>
+      </div>
+
+      <div className="flex gap-2">
         <Select
-          value={filters.status || "none"}
-          onValueChange={handleStatusChange}
+          value={filters.status}
+          onValueChange={(value) =>
+            setFilters((prev) => ({ ...prev, status: value }))
+          }
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger>
             <SelectValue placeholder="Estado" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">Todos</SelectItem>
+            <SelectItem value="all">Todos</SelectItem>
             <SelectItem value="alive">Vivo</SelectItem>
             <SelectItem value="dead">Muerto</SelectItem>
             <SelectItem value="unknown">Desconocido</SelectItem>
           </SelectContent>
         </Select>
+
         <Select
-          value={filters.species || "none"}
-          onValueChange={handleSpeciesChange}
+          value={filters.species}
+          onValueChange={(value) =>
+            setFilters((prev) => ({ ...prev, species: value }))
+          }
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger>
             <SelectValue placeholder="Especie" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">Todas</SelectItem>
+            <SelectItem value="all">Todas</SelectItem>
             <SelectItem value="human">Humano</SelectItem>
             <SelectItem value="alien">Alien</SelectItem>
-            <SelectItem value="robot">Robot</SelectItem>
             <SelectItem value="humanoid">Humanoide</SelectItem>
+            <SelectItem value="poopybutthole">Poopybutthole</SelectItem>
+            <SelectItem value="mythological">Mitológico</SelectItem>
+            <SelectItem value="unknown">Desconocido</SelectItem>
+            <SelectItem value="animal">Animal</SelectItem>
+            <SelectItem value="disease">Enfermedad</SelectItem>
+            <SelectItem value="robot">Robot</SelectItem>
+            <SelectItem value="cronenberg">Cronenberg</SelectItem>
+            <SelectItem value="planet">Planeta</SelectItem>
           </SelectContent>
         </Select>
+
         <Select
-          value={filters.gender || "none"}
-          onValueChange={handleGenderChange}
+          value={filters.gender}
+          onValueChange={(value) =>
+            setFilters((prev) => ({ ...prev, gender: value }))
+          }
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger>
             <SelectValue placeholder="Género" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">Todos</SelectItem>
-            <SelectItem value="male">Masculino</SelectItem>
+            <SelectItem value="all">Todos</SelectItem>
             <SelectItem value="female">Femenino</SelectItem>
+            <SelectItem value="male">Masculino</SelectItem>
             <SelectItem value="genderless">Sin género</SelectItem>
             <SelectItem value="unknown">Desconocido</SelectItem>
           </SelectContent>
         </Select>
-      </div>
-      <div className="flex justify-end gap-2">
-        <Button
-          variant="outline"
-          onClick={handleReset}
-          className="gap-2"
-        >
-          <X className="h-4 w-4" />
-          Limpiar
-        </Button>
       </div>
     </div>
   );
