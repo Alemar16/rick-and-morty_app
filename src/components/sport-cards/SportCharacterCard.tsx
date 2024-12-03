@@ -32,7 +32,7 @@ export function SportCharacterCard({ character, isCenter, position, onCardClick 
       onClick={() => isCenter && onCardClick?.()}
     >
       <Card className={`
-        relative w-[280px] rounded-lg overflow-hidden
+        relative w-[250px] rounded-lg overflow-hidden
         transition-all duration-500 ease-in-out
         transform-gpu
         ${isCenter ? 'hover:scale-105' : ''}
@@ -47,7 +47,7 @@ export function SportCharacterCard({ character, isCenter, position, onCardClick 
         backdrop-blur-sm
       `}>
         <CardContent className="p-0">
-          <AspectRatio ratio={2/3}>
+          <AspectRatio ratio={3/4}>
             <div className="relative w-full h-full">
               {/* Efecto de brillo de fondo */}
               <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-primary/10 opacity-50" />
@@ -69,7 +69,7 @@ export function SportCharacterCard({ character, isCenter, position, onCardClick 
                     object-cover transition-opacity duration-300
                     ${imageLoaded ? 'opacity-100' : 'opacity-0'}
                   `}
-                  sizes="280px"
+                  sizes="250px"
                   priority={isCenter}
                   onLoad={() => setImageLoaded(true)}
                   onError={() => {
