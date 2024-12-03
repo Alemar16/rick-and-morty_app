@@ -14,6 +14,7 @@ interface CharacterSearchGridProps {
   isLoading: boolean;
   isError: boolean;
   onPageChange: (page: number) => void;
+  onCharacterSelect?: (character: Character) => void;
 }
 
 export function CharacterSearchGrid({
@@ -23,6 +24,7 @@ export function CharacterSearchGrid({
   isLoading,
   isError,
   onPageChange,
+  onCharacterSelect
 }: CharacterSearchGridProps) {
   if (isError) {
     return (
@@ -54,6 +56,10 @@ export function CharacterSearchGrid({
     );
   }
 
+  const handleCardClick = (character: Character) => {
+    onCharacterSelect?.(character);
+  };
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 justify-items-center">
@@ -67,7 +73,8 @@ export function CharacterSearchGrid({
               delay: index * 0.1,
               ease: 'easeOut',
             }}
-            className="w-full max-w-[250px]"
+            className="w-full max-w-[250px] cursor-pointer"
+            onClick={() => handleCardClick(character)}
           >
             <CharacterCard character={character} />
           </motion.div>
